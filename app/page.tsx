@@ -53,9 +53,9 @@ export async function generateMetadata(props: PageProps<"/">): Promise<Metadata>
       "Will it be sunny in West San Francisco?",
     );
   }
-  const answer = sunnyAnswer(result.data.cloudyAllDay.verdict);
+  const sky = sunnyAnswer(result.data.cloudyAllDay.verdict) === "Yes" ? "Sunny" : "Cloudy";
   return shareMetadata(
-    `West SF Weather — Sunny ${result.data.day}? ${answer}`,
+    `— ${sky} ${result.data.day}`,
     `${result.data.cloudyAllDay.summary} ${result.data.bestWeather.headline}.`,
   );
 }
