@@ -55,7 +55,7 @@ export async function generateMetadata(props: PageProps<"/">): Promise<Metadata>
   }
   const sky = sunnyAnswer(result.data.cloudyAllDay.verdict) === "Yes" ? "Sunny" : "Cloudy";
   return shareMetadata(
-    `— ${sky} ${result.data.day}`,
+    `West SF Weather — ${sky} ${result.data.day}`,
     `${result.data.cloudyAllDay.summary} ${result.data.bestWeather.headline}.`,
   );
 }
