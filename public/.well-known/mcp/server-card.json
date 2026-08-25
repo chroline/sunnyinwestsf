@@ -1,0 +1,32 @@
+{
+  "name": "west-sf-weather",
+  "title": "West SF Weather",
+  "description": "Will it be cloudy all day tomorrow in West San Francisco, and when is the best weather window. Fixed location, NWS data, cached 1 hour, no auth.",
+  "version": "0.1.0",
+  "transport": {
+    "type": "streamable-http",
+    "endpoint": "/mcp"
+  },
+  "authentication": {
+    "type": "none"
+  },
+  "capabilities": {
+    "tools": true,
+    "resources": false,
+    "prompts": false
+  },
+  "tools": [
+    {
+      "name": "get_west_sf_forecast",
+      "description": "Full West SF tomorrow forecast: verdict, best window, high, hourly."
+    },
+    {
+      "name": "get_cloudy_all_day_verdict",
+      "description": "Yes or no for cloudy all day tomorrow in West SF."
+    },
+    {
+      "name": "get_best_weather_window",
+      "description": "Best contiguous weather window tomorrow in West SF."
+    }
+  ]
+}

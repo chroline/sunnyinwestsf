@@ -1,0 +1,27 @@
+{
+  "linkset": [
+    {
+      "anchor": "/",
+      "item": [
+        {
+          "href": "/openapi.json",
+          "type": "application/openapi+json"
+        },
+        {
+          "href": "/api/forecast",
+          "type": "application/json"
+        },
+        {
+          "href": "/mcp",
+          "type": "application/json"
+        }
+      ],
+      "describedby": [
+        {
+          "href": "/llms.txt",
+          "type": "text/plain"
+        }
+      ]
+    }
+  ]
+}

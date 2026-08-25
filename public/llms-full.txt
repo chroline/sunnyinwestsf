@@ -1,0 +1,38 @@
+# West SF Weather — full notes
+
+West SF Weather is a single-purpose forecast for West San Francisco (Sunset / Ocean Beach / Richmond west of Twin Peaks).
+
+## What it answers
+
+1. Will it be cloudy all day tomorrow? Verdict is `yes` or `no`, plus a one-line summary such as "It'll be sunny from 10am–6pm."
+2. When is the best weather? A contiguous daytime window scored from NWS `shortForecast` text. If every hour is fog/overcast, the window is labeled `least-bad` so the API never invents sun.
+
+## How scoring works
+
+Daytime hours 7am–7pm Pacific. sunny/clear = 4, mostly sunny = 3, partly sunny = 2, mostly cloudy = 1, haze/fog/overcast = 0. The best window is the longest stretch at the day's max score; ties go to the warmer stretch.
+
+Cloudy-all-day uses 10am–5pm. No partly-sunny-or-better hour → yes. Any sun in that window → no.
+
+## Data
+
+National Weather Service hourly and daily forecasts for grid MTR/82,105. Cached 1 hour (`s-maxage=3600` and Next.js `revalidate = 3600`). User-Agent is sent as required by NWS.
+
+## Agent surfaces
+
+- GET / — server-rendered HTML with the verdict and best window in the document (no canvas)
+- GET /index.md — markdown of the same facts
+- GET / with Accept: text/markdown — rewritten to /index.md
+- GET /api/forecast — JSON
+- GET /openapi.json — OpenAPI 3.1
+- POST/GET /mcp — MCP Streamable HTTP
+- GET /.well-known/mcp/server-card.json
+- GET /.well-known/api-catalog
+- GET /llms.txt
+- GET /sitemap.xml
+- GET /robots.txt — AI crawlers allowed
+
+JSON-LD on the homepage: WebApplication, WeatherForecast, FAQPage.
+
+## Payments and auth
+
+None. Public forecast. Do not treat missing payment or OAuth endpoints as errors.

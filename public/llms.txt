@@ -1,0 +1,26 @@
+# West SF Weather
+
+West SF Weather answers one question: will it be cloudy all day tomorrow in West San Francisco, and when is the best weather window.
+
+- Location is fixed to the Outer Sunset (37.76, -122.50), NWS grid MTR/82,105.
+- Data comes from the National Weather Service, cached for 1 hour. No API key. No auth. Free.
+- Humans get a full-screen forecast page. Agents should read the HTML, /index.md, or /api/forecast.
+
+## Read first
+
+- Live forecast as markdown: /index.md
+- Live forecast as JSON: /api/forecast
+- OpenAPI: /openapi.json
+- MCP Streamable HTTP: /mcp
+- Longer notes: /llms-full.txt
+- Homepage HTML (SSR, no JS required for the answer): /
+
+## Tools (MCP)
+
+- get_west_sf_forecast — full hourly payload
+- get_cloudy_all_day_verdict — yes or no plus summary
+- get_best_weather_window — start, end, condition, temp
+
+## Not applicable
+
+This product does not take payments, OAuth, or user accounts. Missing x402, ACP, UCP, and OAuth metadata is intentional, not a broken checkout.
