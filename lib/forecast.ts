@@ -14,7 +14,9 @@ import {
   todayInLA,
 } from "@/lib/verdict";
 
-const FORECAST_CACHE_VERSION = "west-sf-forecast-v8";
+// v9: measurement point moved from Presidio Heights (MTR 84,106) to the
+// Richmond District (MTR 83,106); cache key must not serve old-grid data.
+const FORECAST_CACHE_VERSION = "west-sf-forecast-v9";
 
 async function buildForecast(
   targetDate: string,
