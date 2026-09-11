@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import {
   SCENES,
+  SCENE_FADE_MS,
   buildCloudSprite,
   buildGrainTile,
   createRandom,
@@ -114,7 +115,8 @@ export function SkyCanvas({ scene, rain = false }: Props) {
     const random = createRandom(scene.length * 7919 + 101);
 
     const sprites: Array<HTMLCanvasElement | null> = config.sprites.map(() => null);
-    const spriteReadyAt: number[] = config.sprites.map(() => 0);
+    /** rAF timestamp when every sprite is ready; 0 until then. Shared so layers fade in together. */
+    let cloudsReadyAt = 0;
     const grainTile = buildGrainTile();
     const drops: Drop[] = [];
 
@@ -190,6 +192,13 @@ export function SkyCanvas({ scene, rain = false }: Props) {
      * while repeated drawImage calls stay a cheap blit.
      */
     const drawClouds = (now: number) => {
+      if (sprites.some((sprite) => !sprite)) return;
+      if (!cloudsReadyAt) cloudsReadyAt = now;
+      const fadeIn = reduceMotion
+        ? 1
+        : Math.max(0, Math.min(1, (now - cloudsReadyAt) / SCENE_FADE_MS));
+      if (fadeIn <= 0) return;
+
       for (const layer of config.layers) {
         const sprite = sprites[layer.sprite];
         if (!sprite) continue;
@@ -202,8 +211,6 @@ export function SkyCanvas({ scene, rain = false }: Props) {
         // Normalises the warp so the slice stack still fills exactly layerHeight.
         const warpSpan = k > 0 ? 1 - 1 / (1 + k) : 1;
         const warp = (v: number) => (k > 0 ? (1 - 1 / (1 + k * v)) / warpSpan : v);
-
-        const fadeIn = reduceMotion ? 1 : Math.min(1, (now - spriteReadyAt[layer.sprite]) / 900);
 
         const start = -((elapsed * layer.speed) % tile);
         const columns: Array<[number, number]> = [];
@@ -227,8 +234,11 @@ export function SkyCanvas({ scene, rain = false }: Props) {
           // of pixels at the layer's bottom, which reads as a hard grey line.
           // Fading the last quarter of the layer in *screen* space dissolves
           // the sheet before that edge can show.
-          const edgeFade = Math.min(1, (1 - (w0 + w1) / 2) / 0.25);
-          ctx.globalAlpha = layer.alpha * fadeIn * edgeFade;
+          const edgeFade = Math.min(1, Math.max(0, (1 - (w0 + w1) / 2) / 0.25));
+          // Canvas ignores globalAlpha outside 0–1 and keeps the previous
+          // value (often 1 after the backdrop blit), which flashes the sheet
+          // at full opacity for a frame before the real fade starts.
+          ctx.globalAlpha = Math.max(0, Math.min(1, layer.alpha * fadeIn * edgeFade));
 
           for (const [x, tileWidth] of columns) {
             ctx.drawImage(
@@ -298,13 +308,16 @@ export function SkyCanvas({ scene, rain = false }: Props) {
     };
 
     // Fog sprites cost tens of milliseconds each, so they are built one per
-    // task and faded in as they land rather than blocking the first paint.
+    // task rather than blocking the first paint. Drawing waits until every
+    // sheet is ready so they fade in together instead of staggering.
     const buildSprite = (index: number) => {
       if (disposed || index >= config.sprites.length) return;
       sprites[index] = buildCloudSprite(config.sprites[index]);
-      spriteReadyAt[index] = performance.now();
+      if (index + 1 < config.sprites.length) {
+        window.setTimeout(() => buildSprite(index + 1), 0);
+        return;
+      }
       if (reduceMotion) draw(performance.now());
-      window.setTimeout(() => buildSprite(index + 1), 0);
     };
 
     const onResize = () => {

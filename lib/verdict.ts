@@ -107,14 +107,20 @@ function isSunny(score: number): boolean {
 
 export function cloudyAllDay(hours: HourPoint[], day: string = "tomorrow"): CloudyAllDay {
   // Late in the day the 10am-4pm core has already dropped out of the hourly
-  // feed, so fall back to whatever daylight remains.
+  // feed, so fall back to whatever daylight remains. A sunny day needs a
+  // majority of the 7-hour core partly sunny or better; when fewer hours are
+  // available the requirement shrinks with them.
   const core = hours.filter((hour) => hour.hour >= 10 && hour.hour <= 16);
   const gauge = core.length > 0 ? core : hours;
-  const anySun = gauge.some((hour) => isSunny(hour.score));
-  if (!anySun) {
+  const required = Math.max(1, Math.ceil((4 / 7) * gauge.length));
+  const sunnyHours = gauge.filter((hour) => isSunny(hour.score)).length;
+  if (sunnyHours < required) {
     return {
       verdict: "yes",
-      summary: "Gray all day. No sun expected west of Twin Peaks.",
+      summary:
+        sunnyHours > 0
+          ? "Mostly gray. Only a few hours of sun west of Twin Peaks."
+          : "Gray all day. No sun expected west of Twin Peaks.",
     };
   }
 
