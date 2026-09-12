@@ -1,8 +1,5 @@
 import type { SkyScene } from "@/lib/types";
 
-/** Shared intro fade for cloud sheets and HUD text. */
-export const SCENE_FADE_MS = 900;
-
 export type Rgb = [number, number, number];
 
 export type CloudSpriteSpec = {

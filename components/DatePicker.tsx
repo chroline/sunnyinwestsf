@@ -1,9 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import { ViewTransition } from "react";
 import { useRouter } from "next/navigation";
 import { ChevronDownIcon } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
+import { Dissolve } from "@/components/Dissolve";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { todayInLA } from "@/lib/verdict";
 
@@ -44,8 +46,12 @@ export function DatePicker({ targetDate, label }: Props) {
           />
         }
       >
-        {label}
-        <ChevronDownIcon aria-hidden="true" className="size-4" />
+        <Dissolve value={targetDate}>
+          <span className="inline-block">{label}</span>
+        </Dissolve>
+        <ViewTransition>
+          <ChevronDownIcon aria-hidden="true" className="size-4" />
+        </ViewTransition>
       </PopoverTrigger>
       <PopoverContent className="w-auto bg-white/15 p-0 text-white shadow-lg ring-white/25 backdrop-blur-xl [--accent-foreground:oklch(1_0_0)] [--accent:oklch(1_0_0_/_0.15)] [--background:transparent] [--foreground:oklch(1_0_0)] [--muted-foreground:oklch(1_0_0_/_0.55)] [--muted:oklch(1_0_0_/_0.2)] [--popover-foreground:oklch(1_0_0)] [--popover:transparent]">
         <Calendar

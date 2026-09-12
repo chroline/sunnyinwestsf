@@ -52,7 +52,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="en"
       className={`${sfPro.variable} ${newYork.variable} h-full font-sans antialiased`}
     >
-      <body className="min-h-dvh overflow-x-hidden bg-slate-500 font-sans text-white">
+      <body className="min-h-dvh overflow-x-hidden bg-white font-sans text-white">
         {children}
       </body>
     </html>

@@ -1,3 +1,6 @@
+import { ViewTransition } from "react";
+
+import { Dissolve } from "@/components/Dissolve";
 import { DatePicker } from "@/components/DatePicker";
 import { MethodologyDialog } from "@/components/MethodologyDialog";
 import type { ForecastPayload } from "@/lib/types";
@@ -22,7 +25,7 @@ function Scrim() {
   return (
     <div
       aria-hidden="true"
-      className="scene-fade-item pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(65%_50%_at_50%_50%,rgba(15,23,42,0.32),rgba(15,23,42,0.12)_55%,rgba(15,23,42,0)_78%)] [--i:0]"
+      className="scene-bg-fade pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(65%_50%_at_50%_50%,rgba(15,23,42,0.32),rgba(15,23,42,0.12)_55%,rgba(15,23,42,0)_78%)]"
     />
   );
 }
@@ -33,7 +36,7 @@ export function WeatherHud({ data }: Props) {
   return (
     <main className="relative z-10 flex min-h-dvh flex-col items-center justify-center px-6 text-center text-white">
       <Scrim />
-      <div className="absolute top-4 right-4 z-20">
+      <div className="scene-fade-item scene-fade-final absolute top-4 right-4 z-20">
         <MethodologyDialog />
       </div>
       <p className="scene-fade-item text-[21px] font-bold tracking-wide drop-shadow [--i:0]">
@@ -43,18 +46,33 @@ export function WeatherHud({ data }: Props) {
         <DatePicker targetDate={data.targetDate} label={formatTargetDate(data.targetDate)} />
       </div>
       <p className="scene-fade-item mt-14 text-[18px] font-bold text-white/85 drop-shadow [--i:2]">
-        Will it be sunny {data.day}?
+        <ViewTransition>
+          <span className="inline-block">Will it be sunny</span>
+        </ViewTransition>{" "}
+        <Dissolve value={data.day}><span className="inline-block">{data.day}</span></Dissolve>
+        <ViewTransition>
+          <span className="inline-block">?</span>
+        </ViewTransition>
       </p>
       <h1 className="scene-fade-item mt-3 font-serif text-[104px] leading-none tracking-tight italic drop-shadow-lg [--i:3]">
-        {sunnyAnswer(data.cloudyAllDay.verdict) === "Yes" ? "Yes!" : "No :("}
+        <Dissolve value={sunnyAnswer(data.cloudyAllDay.verdict)}>
+          <span className="inline-block">{sunnyAnswer(data.cloudyAllDay.verdict) === "Yes" ? "Yes!" : "No :("}</span>
+        </Dissolve>
       </h1>
       <p className="scene-fade-item mt-12 max-w-md text-[20px] font-bold drop-shadow [--i:4]">
-        {bestPrefix}: {data.bestWeather.label}
+        <ViewTransition>
+          <span className="inline-block">{bestPrefix}:</span>
+        </ViewTransition>{" "}
+        <Dissolve value={data.bestWeather.label}>
+          <span className="inline-block">{data.bestWeather.label}</span>
+        </Dissolve>
       </p>
       <p className="scene-fade-item mt-3 max-w-lg text-[16px] text-white/85 drop-shadow [--i:5]">
-        {data.cloudyAllDay.summary}
+        <Dissolve value={data.cloudyAllDay.summary}>
+          <span className="inline-block">{data.cloudyAllDay.summary}</span>
+        </Dissolve>
       </p>
-      <footer className="scene-fade-item absolute bottom-6 left-1/2 inline-flex h-8 -translate-x-1/2 items-center whitespace-nowrap rounded-xl bg-white/15 px-3 text-[13px] text-white shadow-lg ring-1 ring-white/25 backdrop-blur-xl transition-colors hover:bg-white/25 [--i:6]">
+      <footer className="scene-fade-item scene-fade-final absolute bottom-6 left-1/2 inline-flex h-8 -translate-x-1/2 items-center whitespace-nowrap rounded-xl bg-white/15 px-3 text-[13px] text-white shadow-lg ring-1 ring-white/25 backdrop-blur-xl transition-colors hover:bg-white/25">
         <span>
           made with ☕ by{" "}
           <a
