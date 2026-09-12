@@ -57,6 +57,14 @@ body {
   min-height: 100%;
 }
 
+:root {
+  --t-bg-delay: 200ms;
+  --t-bg-duration: 500ms;
+  --t-text-delay: 500ms;
+  --t-text-stagger: 90ms;
+  --t-final-delay: 2050ms;
+}
+
 @keyframes scene-fade-in {
   from {
     opacity: 0;
@@ -66,16 +74,79 @@ body {
   }
 }
 
+.scene-bg-fade {
+  opacity: 0;
+  animation: scene-fade-in var(--t-bg-duration) ease-out both;
+  animation-delay: var(--t-bg-delay);
+}
+
 .scene-fade-item {
   opacity: 0;
   animation: scene-fade-in 900ms ease-out forwards;
-  animation-delay: calc(var(--i, 0) * 90ms);
+  animation-delay: calc(var(--t-text-delay) + var(--i, 0) * var(--t-text-stagger));
+}
+
+.scene-fade-item.scene-fade-final {
+  animation-delay: var(--t-final-delay);
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .scene-fade-item {
+  .scene-fade-item,
+  .scene-bg-fade {
     opacity: 1;
     animation: none;
+  }
+}
+
+::view-transition-group(*),
+::view-transition-old(*),
+::view-transition-new(*) {
+  animation-duration: 300ms;
+}
+
+::view-transition-image-pair(.vt-dissolve) {
+  animation: vt-dissolve-blur 300ms ease-in-out both;
+}
+
+/* Fragments crossfade in place: no geometry tween, and each snapshot keeps its
+   own width (centered on the new box) so long→short text never stretches. */
+::view-transition-group(.vt-dissolve) {
+  animation: none;
+}
+
+::view-transition-old(.vt-dissolve),
+::view-transition-new(.vt-dissolve) {
+  inline-size: auto;
+  block-size: auto;
+  inset: 0;
+  margin: auto;
+}
+
+@keyframes vt-dissolve-blur {
+  0% {
+    filter: blur(0);
+  }
+  40% {
+    filter: blur(3px);
+  }
+  100% {
+    filter: blur(0);
+  }
+}
+
+::view-transition {
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation-duration: 0s !important;
+    animation-delay: 0s !important;
+  }
+  ::view-transition-image-pair(*) {
+    animation: none !important;
   }
 }
 

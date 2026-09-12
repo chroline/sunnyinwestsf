@@ -3,7 +3,6 @@
 import { useEffect, useRef } from "react";
 import {
   SCENES,
-  SCENE_FADE_MS,
   buildCloudSprite,
   buildGrainTile,
   createRandom,
@@ -115,8 +114,6 @@ export function SkyCanvas({ scene, rain = false }: Props) {
     const random = createRandom(scene.length * 7919 + 101);
 
     const sprites: Array<HTMLCanvasElement | null> = config.sprites.map(() => null);
-    /** rAF timestamp when every sprite is ready; 0 until then. Shared so layers fade in together. */
-    let cloudsReadyAt = 0;
     const grainTile = buildGrainTile();
     const drops: Drop[] = [];
 
@@ -191,13 +188,8 @@ export function SkyCanvas({ scene, rain = false }: Props) {
      * transform that changes every frame forces the tile to be re-rasterized,
      * while repeated drawImage calls stay a cheap blit.
      */
-    const drawClouds = (now: number) => {
+    const drawClouds = () => {
       if (sprites.some((sprite) => !sprite)) return;
-      if (!cloudsReadyAt) cloudsReadyAt = now;
-      const fadeIn = reduceMotion
-        ? 1
-        : Math.max(0, Math.min(1, (now - cloudsReadyAt) / SCENE_FADE_MS));
-      if (fadeIn <= 0) return;
 
       for (const layer of config.layers) {
         const sprite = sprites[layer.sprite];
@@ -238,7 +230,7 @@ export function SkyCanvas({ scene, rain = false }: Props) {
           // Canvas ignores globalAlpha outside 0–1 and keeps the previous
           // value (often 1 after the backdrop blit), which flashes the sheet
           // at full opacity for a frame before the real fade starts.
-          ctx.globalAlpha = Math.max(0, Math.min(1, layer.alpha * fadeIn * edgeFade));
+          ctx.globalAlpha = Math.max(0, Math.min(1, layer.alpha * edgeFade));
 
           for (const [x, tileWidth] of columns) {
             ctx.drawImage(
@@ -287,7 +279,7 @@ export function SkyCanvas({ scene, rain = false }: Props) {
 
       if (backdrop) ctx.drawImage(backdrop, 0, 0, width, height);
 
-      drawClouds(now);
+      drawClouds();
 
       if (bloom) {
         ctx.globalCompositeOperation = "lighter";
@@ -346,7 +338,7 @@ export function SkyCanvas({ scene, rain = false }: Props) {
     <canvas
       ref={canvasRef}
       aria-hidden="true"
-      className="pointer-events-none fixed inset-0 h-full w-full"
+      className="scene-bg-fade pointer-events-none fixed inset-0 h-full w-full"
     />
   );
 }

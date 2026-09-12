@@ -65,7 +65,8 @@ export default async function Home(props: PageProps<"/">) {
 
   if (!result.ok) {
     return (
-      <div className={`relative min-h-dvh ${SKY.cloudy}`}>
+      <div className="relative min-h-dvh">
+        <div aria-hidden="true" className={`scene-bg-fade fixed inset-0 ${SKY.cloudy}`} />
         <SkyCanvas scene="cloudy" />
         <ForecastUnavailable message={result.error} />
       </div>
@@ -79,7 +80,8 @@ export default async function Home(props: PageProps<"/">) {
   const { condition } = result.data.now;
 
   return (
-    <div className={`relative min-h-dvh ${SKY[scene]}`}>
+    <div className="relative min-h-dvh">
+      <div aria-hidden="true" className={`scene-bg-fade fixed inset-0 ${SKY[scene]}`} />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(forecastJsonLd(result.data)) }}
